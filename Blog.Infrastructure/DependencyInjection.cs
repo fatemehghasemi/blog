@@ -1,4 +1,6 @@
+using Blog.Application.Abstractions.Persistence;
 using Blog.Infrastructure.Persistence;
+using Blog.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,7 @@ public static class DependencyInjection
 
         services.AddDbContext<BlogDbContext>(options =>
             options.UseSqlServer(connectionString));
+        services.AddScoped<IArticleRepository, ArticleRepository>();
 
         return services;
     }

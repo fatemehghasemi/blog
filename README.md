@@ -1,60 +1,94 @@
-# BlazorBlog
-
-> A modern blog platform built with Blazor and Clean Architecture
-
----
+# BlazorBlog (Backend API Only)
 
 ## About
 
-BlazorBlog is a clean and scalable blogging system designed using modern .NET architectural patterns.
+BlazorBlog is a modern backend blog system built with:
 
-The goal of this project is to build a real-world, production-style blog while keeping the codebase simple, maintainable, and extensible.
+- Clean Architecture
+- CQRS pattern
+- ASP.NET Core Minimal APIs
+- Entity Framework Core (SQL Server)
+- Swagger for API documentation
 
-This project focuses on:
-
-- Clean Architecture principles
-- Feature-based design (CQRS)
-- Incremental, real-world development approach
-
----
+This project is designed as a production-style backend service with no frontend/UI layer.
 
 ## Architecture
 
-The solution follows a **Hybrid Clean Architecture + Feature-based CQRS approach**:
+The solution follows Clean Architecture with feature-based CQRS:
 
-- **Domain**
-  - Core business logic
-  - Entities (Article, Comment, User)
-- **Application**
-  - Features (CQRS style)
-  - Interfaces & DTOs
-- **Infrastructure**
-  - Persistence (EF Core)
-  - External integrations
-- **Web**
-  - Blazor Server UI
-  - API Endpoints
+- `Blog.Domain`
+  - Core business rules
+  - Entities and value objects (such as `Slug`)
+- `Blog.Application`
+  - Use cases and CQRS handlers
+  - DTOs and abstraction contracts
+- `Blog.Infrastructure`
+  - EF Core persistence and SQL Server integration
+  - Implementation of application abstractions
+- `Blog.Web` (API Host only)
+  - HTTP API layer (Minimal APIs)
+  - Swagger/OpenAPI exposure
 
----
+There is no UI layer in this system. The web project acts as the API gateway only.
 
-##  Tech Stack
+## Features
+
+- Article management (Create / Read)
+- Clean CQRS implementation
+- SQL Server persistence
+- Swagger API documentation
+- Value Objects (`Slug`)
+
+## Tech Stack
 
 - .NET
-- Blazor Server
-- ASP.NET Core
+- ASP.NET Core Minimal APIs
 - Entity Framework Core
+- SQL Server
+- Swagger
 - Clean Architecture
-- CQRS Pattern
 
----
+## API Overview
 
-##  Getting Started
+- `POST /api/articles`
+  - Creates a new article
+- `GET /api/articles`
+  - Returns the list of persisted articles
 
-### Prerequisites
+Swagger UI is the primary interface for exploring and testing endpoints.
 
-- .NET SDK
+## Project Structure
 
-### Run locally
+```text
+src/
+  Blog.Domain
+  Blog.Application
+  Blog.Infrastructure
+  Blog.Web
+tests/
+  Blog.Tests
+```
+
+Current repository layout keeps these projects at the solution root with the same boundaries.
+
+## Design Principles
+
+- Separation of concerns
+- Feature-based architecture
+- No UI dependency
+- Backend-first design
+- Scalability and maintainability
+
+## Roadmap
+
+- Article system (completed foundation)
+- Comment system
+- Authentication (JWT)
+- Email notifications (RabbitMQ integration)
+- Search (Elasticsearch)
+- Event-driven architecture
+
+## How to Run
 
 ```bash
 dotnet restore
@@ -62,29 +96,14 @@ dotnet build
 dotnet run --project Blog.Web
 ```
 
----
+Then open Swagger UI:
 
-##  Project Structure
+- `http://localhost:<port>/swagger`
 
-```text
-Blog.Domain
-Blog.Application
-Blog.Infrastructure
-Blog.Web
-Blog.Tests
-```
+## License
 
----
+MIT
 
-##  Design Principles
-
-- Separation of concerns
-- Feature-based structure
-- Simplicity over over-engineering
-- Scalable architecture
-
----
-
-##  Author
+## Author
 
 Fatemeh Ghasemi

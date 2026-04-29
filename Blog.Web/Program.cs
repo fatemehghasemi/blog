@@ -23,6 +23,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.MapArticlesEndpoints();
+app.MapCommentsEndpoints();
 
 app.Run();
 

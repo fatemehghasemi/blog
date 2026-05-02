@@ -19,6 +19,7 @@ public static class DependencyInjection
             options.UseSqlServer(connectionString));
         services.AddScoped<IArticleRepository, ArticleRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
+        services.AddScoped<ILikeRepository, LikeRepository>();
 
         return services;
     }

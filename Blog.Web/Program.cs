@@ -24,6 +24,7 @@ app.UseSwaggerUI();
 
 app.MapArticlesEndpoints();
 app.MapCommentsEndpoints();
+app.MapLikesEndpoints();
 
 app.Run();
 

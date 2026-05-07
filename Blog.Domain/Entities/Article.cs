@@ -1,10 +1,11 @@
+using Blog.Domain.Common;
+using Blog.Domain.Events;
 using Blog.Domain.ValueObjects;
 
 namespace Blog.Domain.Entities;
 
-public sealed class Article
+public sealed class Article : Entity
 {
-    public Guid Id { get; private set; }
     public string Title { get; private set; } = string.Empty;
     public string Content { get; private set; } = string.Empty;
     public Slug Slug { get; private set; } = Slug.Generate("untitled");
@@ -14,7 +15,7 @@ public sealed class Article
     {
     }
 
-    public Article(string title, string content)
+    private Article(string title, string content)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -31,5 +32,12 @@ public sealed class Article
         Content = content.Trim();
         Slug = Slug.Generate(Title);
         CreatedAt = DateTime.UtcNow;
+    }
+
+    public static Article Create(string title, string content)
+    {
+        var article = new Article(title, content);
+        article.AddDomainEvent(new ArticlePublishedEvent(article.Id, article.Title, article.Slug.Value));
+        return article;
     }
 }

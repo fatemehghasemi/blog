@@ -15,7 +15,7 @@ public sealed class CreateArticleCommandHandler
 
     public async Task<CreateArticleResponse> HandleAsync(CreateArticleCommand command, CancellationToken cancellationToken)
     {
-        var article = new Article(command.Title, command.Content);
+        var article = Article.Create(command.Title, command.Content);
 
         await _articleRepository.AddAsync(article, cancellationToken);
 

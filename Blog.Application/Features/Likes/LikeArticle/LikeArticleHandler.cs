@@ -15,7 +15,7 @@ public sealed class LikeArticleHandler
 
     public async Task<LikeResponse> HandleAsync(LikeArticleCommand command, CancellationToken cancellationToken)
     {
-        var like = new Like(command.ArticleId, command.ClientId);
+        var like = Like.Create(command.ArticleId, command.ClientId);
         await _likeRepository.AddAsync(like, cancellationToken);
 
         return new LikeResponse

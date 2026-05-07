@@ -2,6 +2,7 @@ using Blog.Application.DTOs;
 using Blog.Application.Exceptions;
 using Blog.Application.Features.Comments.CreateComment;
 using Blog.Application.Features.Comments.GetCommentsByArticle;
+using Blog.Application.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Blog.Web.Endpoints;
@@ -18,16 +19,19 @@ public static class CommentsEndpoints
                     Guid articleId,
                     CreateCommentRequest request,
                     CreateCommentHandler handler,
+                    ICommandExecutionPipeline commandPipeline,
                     CancellationToken cancellationToken) =>
                 {
                     try
                     {
-                        var response = await handler.HandleAsync(new CreateCommentCommand
-                        {
-                            ArticleId = articleId,
-                            Content = request.Content,
-                            ParentCommentId = request.ParentCommentId
-                        }, cancellationToken);
+                        var response = await commandPipeline.ExecuteAsync(
+                            ct => handler.HandleAsync(new CreateCommentCommand
+                            {
+                                ArticleId = articleId,
+                                Content = request.Content,
+                                ParentCommentId = request.ParentCommentId
+                            }, ct),
+                            cancellationToken);
 
                         return TypedResults.Created($"/api/articles/{articleId}/comments/{response.Id}", response);
                     }

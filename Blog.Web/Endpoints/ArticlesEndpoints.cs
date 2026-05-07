@@ -2,6 +2,7 @@ using Blog.Application.DTOs;
 using Blog.Application.Exceptions;
 using Blog.Application.Features.Articles.Commands.CreateArticle;
 using Blog.Application.Features.Articles.Queries.GetArticles;
+using Blog.Application.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Blog.Web.Endpoints;
@@ -17,15 +18,18 @@ public static class ArticlesEndpoints
                 async Task<Results<Created<CreateArticleResponse>, BadRequest<string>, Conflict<string>>> (
                     CreateArticleRequest request,
                     CreateArticleCommandHandler handler,
+                    ICommandExecutionPipeline commandPipeline,
                     CancellationToken cancellationToken) =>
                 {
                     try
                     {
-                        var response = await handler.HandleAsync(new CreateArticleCommand
-                        {
-                            Title = request.Title,
-                            Content = request.Content
-                        }, cancellationToken);
+                        var response = await commandPipeline.ExecuteAsync(
+                            ct => handler.HandleAsync(new CreateArticleCommand
+                            {
+                                Title = request.Title,
+                                Content = request.Content
+                            }, ct),
+                            cancellationToken);
 
                         return TypedResults.Created($"/api/articles/{response.Id}", response);
                     }

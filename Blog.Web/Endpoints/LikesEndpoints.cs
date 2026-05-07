@@ -3,6 +3,7 @@ using Blog.Application.Exceptions;
 using Blog.Application.Features.Likes.GetArticleLikesCount;
 using Blog.Application.Features.Likes.LikeArticle;
 using Blog.Application.Features.Likes.UnlikeArticle;
+using Blog.Application.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Blog.Web.Endpoints;
@@ -19,6 +20,7 @@ public static class LikesEndpoints
                     Guid articleId,
                     HttpContext httpContext,
                     LikeArticleHandler handler,
+                    ICommandExecutionPipeline commandPipeline,
                     CancellationToken cancellationToken) =>
                 {
                     if (!TryGetClientId(httpContext, out var clientId))
@@ -28,11 +30,13 @@ public static class LikesEndpoints
 
                     try
                     {
-                        var response = await handler.HandleAsync(new LikeArticleCommand
-                        {
-                            ArticleId = articleId,
-                            ClientId = clientId
-                        }, cancellationToken);
+                        var response = await commandPipeline.ExecuteAsync(
+                            ct => handler.HandleAsync(new LikeArticleCommand
+                            {
+                                ArticleId = articleId,
+                                ClientId = clientId
+                            }, ct),
+                            cancellationToken);
 
                         return TypedResults.Created($"/api/articles/{articleId}/like", response);
                     }
@@ -59,6 +63,7 @@ public static class LikesEndpoints
                     Guid articleId,
                     HttpContext httpContext,
                     UnlikeArticleHandler handler,
+                    ICommandExecutionPipeline commandPipeline,
                     CancellationToken cancellationToken) =>
                 {
                     if (!TryGetClientId(httpContext, out var clientId))
@@ -66,11 +71,13 @@ public static class LikesEndpoints
                         return TypedResults.BadRequest("X-Client-Id header is required.");
                     }
 
-                    await handler.HandleAsync(new UnlikeArticleCommand
-                    {
-                        ArticleId = articleId,
-                        ClientId = clientId
-                    }, cancellationToken);
+                    await commandPipeline.ExecuteAsync(
+                        ct => handler.HandleAsync(new UnlikeArticleCommand
+                        {
+                            ArticleId = articleId,
+                            ClientId = clientId
+                        }, ct),
+                        cancellationToken);
 
                     return TypedResults.NoContent();
                 })

@@ -1,8 +1,9 @@
+using Blog.Domain.Common;
+
 namespace Blog.Domain.Entities;
 
-public sealed class Comment
+public sealed class Comment : Entity
 {
-    public Guid Id { get; private set; }
     public Guid ArticleId { get; private set; }
     public Guid? ParentCommentId { get; private set; }
     public string Content { get; private set; } = string.Empty;

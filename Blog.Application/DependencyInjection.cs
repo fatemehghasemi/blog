@@ -1,12 +1,13 @@
 using Blog.Application.Execution;
-using Blog.Application.Features.Articles.Commands.CreateArticle;
-using Blog.Application.Features.Articles.Queries.GetArticles;
-using Blog.Application.Features.Comments.CreateComment;
-using Blog.Application.Features.Comments.GetCommentsByArticle;
-using Blog.Application.Features.Likes.GetArticleLikesCount;
-using Blog.Application.Features.Likes.LikeArticle;
-using Blog.Application.Features.Likes.UnlikeArticle;
+using Blog.Application.Articles.Commands.CreateArticle;
+using Blog.Application.Articles.Queries.GetArticleById;
+using Blog.Application.Articles.Queries.GetArticlesList;
+using Blog.Application.Comments.Commands.AddComment;
+using Blog.Application.Comments.Queries.GetCommentsByArticle;
 using Blog.Application.Interfaces;
+using Blog.Application.Likes.Commands.LikeArticle;
+using Blog.Application.Likes.Commands.UnlikeArticle;
+using Blog.Application.Likes.Queries.GetArticleLikesCount;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Blog.Application;
@@ -18,12 +19,13 @@ public static class DependencyInjection
         services.AddScoped<ICommandExecutionPipeline, CommandExecutionPipeline>();
 
         services.AddScoped<CreateArticleCommandHandler>();
-        services.AddScoped<GetArticlesQueryHandler>();
-        services.AddScoped<CreateCommentHandler>();
-        services.AddScoped<GetCommentsHandler>();
-        services.AddScoped<LikeArticleHandler>();
-        services.AddScoped<UnlikeArticleHandler>();
-        services.AddScoped<GetArticleLikesCountHandler>();
+        services.AddScoped<GetArticlesListQueryHandler>();
+        services.AddScoped<GetArticleByIdQueryHandler>();
+        services.AddScoped<AddCommentCommandHandler>();
+        services.AddScoped<GetCommentsByArticleQueryHandler>();
+        services.AddScoped<LikeArticleCommandHandler>();
+        services.AddScoped<UnlikeArticleCommandHandler>();
+        services.AddScoped<GetArticleLikesCountQueryHandler>();
 
         return services;
     }

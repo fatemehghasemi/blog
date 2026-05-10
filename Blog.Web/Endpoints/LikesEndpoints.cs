@@ -1,9 +1,8 @@
-using Blog.Application.DTOs;
 using Blog.Application.Exceptions;
-using Blog.Application.Features.Likes.GetArticleLikesCount;
-using Blog.Application.Features.Likes.LikeArticle;
-using Blog.Application.Features.Likes.UnlikeArticle;
 using Blog.Application.Interfaces;
+using Blog.Application.Likes.Commands.LikeArticle;
+using Blog.Application.Likes.Commands.UnlikeArticle;
+using Blog.Application.Likes.Queries.GetArticleLikesCount;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Blog.Web.Endpoints;
@@ -16,10 +15,10 @@ public static class LikesEndpoints
             .WithTags("Likes");
 
         group.MapPost("/{articleId:guid}/like",
-                async Task<Results<Created<LikeResponse>, BadRequest<string>, Conflict<string>>> (
+                async Task<Results<Created<LikeArticleResponse>, BadRequest<string>, Conflict<string>>> (
                     Guid articleId,
                     HttpContext httpContext,
-                    LikeArticleHandler handler,
+                    LikeArticleCommandHandler commandHandler,
                     ICommandExecutionPipeline commandPipeline,
                     CancellationToken cancellationToken) =>
                 {
@@ -31,7 +30,7 @@ public static class LikesEndpoints
                     try
                     {
                         var response = await commandPipeline.ExecuteAsync(
-                            ct => handler.HandleAsync(new LikeArticleCommand
+                            ct => commandHandler.HandleAsync(new LikeArticleCommand
                             {
                                 ArticleId = articleId,
                                 ClientId = clientId
@@ -54,7 +53,7 @@ public static class LikesEndpoints
                     }
                 })
             .WithName("LikeArticle")
-            .Produces<LikeResponse>(StatusCodes.Status201Created)
+            .Produces<LikeArticleResponse>(StatusCodes.Status201Created)
             .Produces<string>(StatusCodes.Status400BadRequest)
             .Produces<string>(StatusCodes.Status409Conflict);
 
@@ -62,7 +61,7 @@ public static class LikesEndpoints
                 async Task<Results<NoContent, BadRequest<string>>> (
                     Guid articleId,
                     HttpContext httpContext,
-                    UnlikeArticleHandler handler,
+                    UnlikeArticleCommandHandler commandHandler,
                     ICommandExecutionPipeline commandPipeline,
                     CancellationToken cancellationToken) =>
                 {
@@ -72,7 +71,7 @@ public static class LikesEndpoints
                     }
 
                     await commandPipeline.ExecuteAsync(
-                        ct => handler.HandleAsync(new UnlikeArticleCommand
+                        ct => commandHandler.HandleAsync(new UnlikeArticleCommand
                         {
                             ArticleId = articleId,
                             ClientId = clientId
@@ -88,10 +87,10 @@ public static class LikesEndpoints
         group.MapGet("/{articleId:guid}/likes/count",
                 async Task<Ok<int>> (
                     Guid articleId,
-                    GetArticleLikesCountHandler handler,
+                    GetArticleLikesCountQueryHandler queryHandler,
                     CancellationToken cancellationToken) =>
                 {
-                    var count = await handler.HandleAsync(new GetArticleLikesCountQuery
+                    var count = await queryHandler.HandleAsync(new GetArticleLikesCountQuery
                     {
                         ArticleId = articleId
                     }, cancellationToken);

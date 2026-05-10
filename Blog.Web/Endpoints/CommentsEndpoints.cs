@@ -1,7 +1,6 @@
-using Blog.Application.DTOs;
+using Blog.Application.Comments.Commands.AddComment;
+using Blog.Application.Comments.Queries.GetCommentsByArticle;
 using Blog.Application.Exceptions;
-using Blog.Application.Features.Comments.CreateComment;
-using Blog.Application.Features.Comments.GetCommentsByArticle;
 using Blog.Application.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -15,17 +14,17 @@ public static class CommentsEndpoints
             .WithTags("Comments");
 
         group.MapPost("/",
-                async Task<Results<Created<CommentDto>, BadRequest<string>, Conflict<string>>> (
+                async Task<Results<Created<AddCommentResponse>, BadRequest<string>, Conflict<string>>> (
                     Guid articleId,
-                    CreateCommentRequest request,
-                    CreateCommentHandler handler,
+                    AddCommentRequest request,
+                    AddCommentCommandHandler commandHandler,
                     ICommandExecutionPipeline commandPipeline,
                     CancellationToken cancellationToken) =>
                 {
                     try
                     {
                         var response = await commandPipeline.ExecuteAsync(
-                            ct => handler.HandleAsync(new CreateCommentCommand
+                            ct => commandHandler.HandleAsync(new AddCommentCommand
                             {
                                 ArticleId = articleId,
                                 Content = request.Content,
@@ -45,17 +44,17 @@ public static class CommentsEndpoints
                     }
                 })
             .WithName("CreateComment")
-            .Produces<CommentDto>(StatusCodes.Status201Created)
+            .Produces<AddCommentResponse>(StatusCodes.Status201Created)
             .Produces<string>(StatusCodes.Status400BadRequest)
             .Produces<string>(StatusCodes.Status409Conflict);
 
         group.MapGet("/",
-                async Task<Ok<IReadOnlyList<CommentDto>>> (
+                async Task<Ok<IReadOnlyList<CommentResponse>>> (
                     Guid articleId,
-                    GetCommentsHandler handler,
+                    GetCommentsByArticleQueryHandler queryHandler,
                     CancellationToken cancellationToken) =>
                 {
-                    var response = await handler.HandleAsync(new GetCommentsQuery
+                    var response = await queryHandler.HandleAsync(new GetCommentsByArticleQuery
                     {
                         ArticleId = articleId
                     }, cancellationToken);
@@ -63,7 +62,7 @@ public static class CommentsEndpoints
                     return TypedResults.Ok(response);
                 })
             .WithName("GetCommentsByArticle")
-            .Produces<IReadOnlyList<CommentDto>>(StatusCodes.Status200OK);
+            .Produces<IReadOnlyList<CommentResponse>>(StatusCodes.Status200OK);
 
         return app;
     }

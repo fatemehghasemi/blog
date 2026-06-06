@@ -8,6 +8,7 @@ using Blog.Application.Interfaces;
 using Blog.Application.Likes.Commands.LikeArticle;
 using Blog.Application.Likes.Commands.UnlikeArticle;
 using Blog.Application.Likes.Queries.GetArticleLikesCount;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Blog.Application;
@@ -16,6 +17,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+
         services.AddScoped<ICommandExecutionPipeline, CommandExecutionPipeline>();
 
         services.AddScoped<CreateArticleCommandHandler>();

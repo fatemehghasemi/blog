@@ -58,6 +58,14 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
                 validationProblem.Extensions["errors"] = validationException.Errors;
                 return validationProblem;
 
+            case BadHttpRequestException badRequestException:
+                return new ProblemDetails
+                {
+                    Status = badRequestException.StatusCode,
+                    Title = "Invalid request",
+                    Detail = badRequestException.Message
+                };
+
             case ArgumentException argumentException:
                 return new ProblemDetails
                 {

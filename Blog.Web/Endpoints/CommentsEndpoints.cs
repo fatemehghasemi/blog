@@ -1,6 +1,5 @@
 using Blog.Application.Comments.Commands.AddComment;
 using Blog.Application.Comments.Queries.GetCommentsByArticle;
-using Blog.Application.Exceptions;
 using Blog.Application.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -14,39 +13,31 @@ public static class CommentsEndpoints
             .WithTags("Comments");
 
         group.MapPost("/",
-                async Task<Results<Created<AddCommentResponse>, BadRequest<string>, Conflict<string>>> (
+                async Task<Created<AddCommentResponse>> (
                     Guid articleId,
                     AddCommentRequest request,
                     AddCommentCommandHandler commandHandler,
                     ICommandExecutionPipeline commandPipeline,
                     CancellationToken cancellationToken) =>
                 {
-                    try
+                    var command = new AddCommentCommand
                     {
-                        var response = await commandPipeline.ExecuteAsync(
-                            ct => commandHandler.HandleAsync(new AddCommentCommand
-                            {
-                                ArticleId = articleId,
-                                Content = request.Content,
-                                ParentCommentId = request.ParentCommentId
-                            }, ct),
-                            cancellationToken);
+                        ArticleId = articleId,
+                        Content = request.Content,
+                        ParentCommentId = request.ParentCommentId
+                    };
 
-                        return TypedResults.Created($"/api/articles/{articleId}/comments/{response.Id}", response);
-                    }
-                    catch (ArgumentException ex)
-                    {
-                        return TypedResults.BadRequest(ex.Message);
-                    }
-                    catch (InvalidCommentReferenceException ex)
-                    {
-                        return TypedResults.Conflict(ex.Message);
-                    }
+                    var response = await commandPipeline.ExecuteAsync(
+                        command,
+                        (cmd, ct) => commandHandler.HandleAsync(cmd, ct),
+                        cancellationToken);
+
+                    return TypedResults.Created($"/api/articles/{articleId}/comments/{response.Id}", response);
                 })
             .WithName("CreateComment")
             .Produces<AddCommentResponse>(StatusCodes.Status201Created)
-            .Produces<string>(StatusCodes.Status400BadRequest)
-            .Produces<string>(StatusCodes.Status409Conflict);
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status409Conflict);
 
         group.MapGet("/",
                 async Task<Ok<IReadOnlyList<CommentResponse>>> (

@@ -41,23 +41,6 @@ internal sealed class CommandExecutionPipeline : ICommandExecutionPipeline
         await _unitOfWorkDomainEventProcessor.SaveChangesAndDispatchEventsAsync(cancellationToken);
     }
 
-    public async Task<TResult> ExecuteAsync<TResult>(
-        Func<CancellationToken, Task<TResult>> commandExecution,
-        CancellationToken cancellationToken = default)
-    {
-        var result = await commandExecution(cancellationToken);
-        await _unitOfWorkDomainEventProcessor.SaveChangesAndDispatchEventsAsync(cancellationToken);
-        return result;
-    }
-
-    public async Task ExecuteAsync(
-        Func<CancellationToken, Task> commandExecution,
-        CancellationToken cancellationToken = default)
-    {
-        await commandExecution(cancellationToken);
-        await _unitOfWorkDomainEventProcessor.SaveChangesAndDispatchEventsAsync(cancellationToken);
-    }
-
     private async Task ValidateAsync<TCommand>(TCommand command, CancellationToken cancellationToken)
     {
         var validators = _serviceProvider.GetServices<IValidator<TCommand>>();

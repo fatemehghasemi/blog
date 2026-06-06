@@ -1,4 +1,8 @@
 using Blog.Application.Abstractions.Persistence;
+using Blog.Application.Interfaces;
+using Blog.Domain.Events;
+using Blog.Infrastructure.Events;
+using Blog.Infrastructure.Events.Handlers;
 using Blog.Infrastructure.Persistence;
 using Blog.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +24,12 @@ public static class DependencyInjection
         services.AddScoped<IArticleRepository, ArticleRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<ILikeRepository, LikeRepository>();
+
+        services.AddScoped<IDomainEventCollector, DomainEventCollector>();
+        services.AddScoped<IEventDispatcher, EventDispatcher>();
+        services.AddScoped<IUnitOfWorkDomainEventProcessor, UnitOfWorkDomainEventProcessor>();
+
+        services.AddScoped<IDomainEventHandler<ArticlePublishedEvent>, ArticlePublishedLogHandler>();
 
         return services;
     }

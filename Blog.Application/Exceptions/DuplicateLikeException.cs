@@ -1,6 +1,6 @@
 namespace Blog.Application.Exceptions;
 
-public sealed class DuplicateLikeException : Exception
+public sealed class DuplicateLikeException : ConflictException
 {
     public DuplicateLikeException()
         : base("You have already liked this article.")

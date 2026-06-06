@@ -1,6 +1,6 @@
 namespace Blog.Application.Exceptions;
 
-public sealed class DuplicateSlugException : Exception
+public sealed class DuplicateSlugException : ConflictException
 {
     public DuplicateSlugException(string slug)
         : base($"An article with slug '{slug}' already exists.")

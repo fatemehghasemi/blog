@@ -1,6 +1,6 @@
 namespace Blog.Application.Exceptions;
 
-public sealed class InvalidLikeReferenceException : Exception
+public sealed class InvalidLikeReferenceException : ConflictException
 {
     public InvalidLikeReferenceException()
         : base("Like references are invalid for the target article.")
